@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html ng-app="myModule">
+<head>
+    <meta charset="utf-8" />
+    <title> Highcharts directive demo </title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/treemap.js"></script>
+</head>
+<body>
+
+
+<div id="container" ></div>
+
+<script>
+    URL = "http://alianzacaoba.mockable.io/ssd/social_media/age_gender";
+    $.getJSON(URL,function(mydata,status) {
+        console.log(mydata);
+        var series_data = [];
+        for (var key in mydata){
+            series_data.push(mydata[key]);
+        }
+        var dataLegend = mydata[0].data
+        mydata.shift();
+
+
+        Highcharts.chart('container', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Distribución de Grupos de edad según sexo'
+            },
+            xAxis: {
+                categories: dataLegend
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Valores'
+                }
+            },
+            tooltip: {
+                pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.percentage:.0f}%)<br/>',
+                shared: true
+            },
+            plotOptions: {
+                column: {
+                    stacking: '%'
+                }
+            },
+            series: mydata
+        });
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+    <title>ECharts Sample</title>
+    <script src="http://echarts.baidu.com/dist/echarts.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+</head>
+<body>
+<div id="chart" style="width: 500px; height: 350px;"></div>
+<script type="text/javascript">
+
+    $(document).ready(function(){
+
+        var chart = document.getElementById('chart');
+        var myChart = echarts.init(chart);
+        var dataLegend = [];
+        var data = [];
+       $.getJSON("http://alianzacaoba.mockable.io/ssd/social_media/emotion_gender", function(result){
+            for (var key in result){
+                //data.push(result[key].value, result[key].name);
+                data.push(result[key]);
+            }
+           dataLegend = data[0].value;
+           data.shift();
+
+
+          var option = {
+
+            title: {
+                text: 'Emociones de los usuarios en la red',
+                subtext: 'Source: Tweeter',
+                x: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : ({d}%)"
+            },
+            legend: {
+                x: 'center',
+                y: 'bottom',
+                data: dataLegend
+
+
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    magicType: {
+                        show: true,
+                        type: ['pie', 'funnel']
+                    },
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+
+            calculable: true,
+            series: [{
+                name: 'Emociones',
+                type: 'pie',
+                radius: [20, 110],
+                center: ['50%', '50%'],
+                roseType: 'radius',
+                width: '50%',       // for funnel
+                max: 40,            // for funnel
+                itemStyle: {
+                    normal: {
+                        label: {
+                            show: true
+                        },
+                        labelLine: {
+                            show: true
+                        }
+                    },
+                    emphasis: {
+                        label: {
+                            show: true
+                        },
+                        labelLine: {
+                            show: true
+                        }
+                    }
+                },
+                data:data
+
+            }]
+        };
+
+        myChart.setOption(option);
+       });
+    });
+
+</script>
+
+</body>
+</html>

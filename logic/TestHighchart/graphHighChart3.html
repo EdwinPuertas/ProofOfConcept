@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html ng-app="myModule">
+<head>
+    <meta charset="utf-8" />
+    <title> Highcharts directive demo </title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+    <script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body ng-controller="myController">
+
+<hc-chart-user-followers title="Número de seguidores por usuario." data="user_followers_data">user_followers</hc-chart-user-followers>
+<hc-chart-interest-polarity title="Polaridad de los intereses" data="interest_polarity_data" categories="preference_tweet_categories">interest_polarity</hc-chart-interest-polarity>
+<hc-chart-segmento title="Segmento" data="segmento_data">segmento</hc-chart-segmento>
+<script>
+
+    angular.module('myModule', [])
+        .controller('myController', function ($scope, $location, $window, $http) {
+            $scope.error = [];
+            $scope.user_followers_data = [];
+            $scope.interest_polarity_data = [];
+
+
+            var chart = angular.element(document.getElementById('theChartElement')).highcharts();
+        })
+
+
+        .directive('hcChartUserFollowers', function ($http) {
+            return {
+                restrict: 'EA',
+                template: "<div></div>",
+                scope: {
+                    title: '@',
+                    data: '='
+                },
+                link: function (scope, element, http) {
+                    scope.chartConfig = {
+                        chart: {
+                            plotBackgroundColor: null,
+                            plotBorderWidth: null,
+                            plotShadow: false,
+                            type: 'pie'
+                        },
+                        title: {
+                            text: scope.title
+                        },
+                        tooltip: {
+                            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                        },
+                        plotOptions: {
+                            pie: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                dataLabels: {
+                                    enabled: true,
+                                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                                    style: {
+                                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                    }
+                                }
+                            }
+                        }
+                    };
+
+                    if (scope.data != undefined) {
+                        $http.get('http://alianzacaoba.mockable.io/ssd/social_media/user_followers')
+                            .success(function(data) {
+                                if(data != "")
+                                {
+
+                                    console.log(" Info age_gender --- " + data);
+
+                                    scope.user_followers_data = [{
+                                        type: 'pie',
+                                        name: 'Tipo',
+                                        innerSize: '60%',
+                                        data: data[0].value
+                                    }];
+
+                                    scope.chartConfig.series = scope.user_followers_data;
+                                    $(element).highcharts(scope.chartConfig);
+                                }
+                                else{
+
+                                    $scope.error.push({"Service ": "social_media/user_followers", "Error": "No hay datos."});
+                                }
+                            })
+                            .error(function(data) {
+                                scope.error.push({"Service ": "social_media/user_followers", "Error": data});
+                                console.log('Error: ' + data);
+                            });
+
+                    }
+
+                }
+            };
+        })
+
+        .directive('hcChartInterestPolarity', function ($http) {
+            return {
+                restrict: 'EA',
+                template: "<div></div>",
+                scope: {
+                    title: '@',
+                    data: '=',
+                    categories: '='
+                },
+                link: function (scope, element, attrs) {
+                    scope.chartConfig = {
+                        chart: {
+                            type: 'column'
+                        },
+                        title: {
+                            text: scope.title
+                        },
+                        xAxis: {
+                            categories: scope.categories
+                        },
+                        yAxis: {
+                            min: 0,
+                            title: {
+                                text: 'Source: Twitter'
+                            }
+                        },
+                        legend: {
+                            reversed: true
+                        },
+                        plotOptions: {
+                            series: {
+                                stacking: 'normal'
+                            }
+                        }
+                    };
+                    if (scope.data != undefined) {
+                        $http.get('http://alianzacaoba.mockable.io/ssd/conversation/interest_polarity')
+                            .success(function(data) {
+                                if(data != "")
+                                {
+                                    console.log(" Info age_gender --- " + data);
+                                    scope.categories = data[0].data;
+                                    scope.interest_polarity_data =  [data[1], data[2], data[3]];
+                                    scope.chartConfig.xAxis= {
+                                        categories: scope.categories
+                                    };
+                                    scope.chartConfig.series = scope.interest_polarity_data;
+                                    $(element).highcharts(scope.chartConfig);
+                                }
+                                else{
+
+                                    $scope.error.push({"Service ": "social_media/age_gender", "Error": "No hay datos."});
+                                }
+                            })
+                            .error(function(data) {
+                                scope.error.push({"Service ": "social_media/age_gender", "Error": data});
+                                console.log('Error: ' + data);
+                            });
+
+                    }
+
+                }
+            };
+        })
+
+        .directive('hcSegmento', function ($http) {
+            return {
+                restrict: 'EA',
+                template: "<div></div>",
+                scope: {
+                    title: '@',
+                    data: '=',
+                    categories: '='
+                },
+                link: function (scope, element, attrs) {
+                    scope.chartConfig = {
+                        chart: {
+                            type: 'solidgauge'
+                        },
+
+                        title: null,
+
+                        pane: {
+                            center: ['50%', '85%'],
+                            size: '140%',
+                            startAngle: -90,
+                            endAngle: 90,
+                            background: {
+                                backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
+                                innerRadius: '60%',
+                                outerRadius: '100%',
+                                shape: 'arc'
+                            }
+                        },
+
+                        tooltip: {
+                            enabled: false
+                        },
+
+                        // the value axis
+                        yAxis: {
+                            stops: [
+                                [0.1, '#55BF3B'], // green
+                                [0.5, '#DDDF0D'], // yellow
+                                [0.9, '#DF5353'] // red
+                            ],
+                            lineWidth: 0,
+                            minorTickInterval: null,
+                            tickAmount: 2,
+                            title: {
+                                y: -70
+                            },
+                            labels: {
+                                y: 16
+                            }
+                        },
+
+                        plotOptions: {
+                            solidgauge: {
+                                dataLabels: {
+                                    y: 5,
+                                    borderWidth: 0,
+                                    useHTML: true
+                                }
+                            }
+                        }
+                    };
+
+
+                }
+            };
+        })
+
+</script>
+</body>
+</html>

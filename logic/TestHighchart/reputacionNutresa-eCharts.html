@@ -1,0 +1,51 @@
+<html>
+<head>
+    <title>ECharts Sample</title>
+    <script src="http://echarts.baidu.com/dist/echarts.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+<body>
+<div id="chart" style="width: 500px; height: 350px;"></div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        var chart = document.getElementById('chart');
+        var myChart = echarts.init(chart);
+        var data = 0;
+        $.getJSON("http://alianzacaoba.mockable.io/ssd/nutresa/nutresa_rep", function(result){
+            data = result[0].value;
+
+            var option = {
+                title: {
+                    text: 'Reputación Nutresa',
+                    x: 'center',
+                    top: 10
+                },
+                tooltip : {
+                    formatter: "{a} : {c}%"
+                },
+                toolbox: {
+                    feature: {
+                        restore: {},
+                        saveAsImage: {}
+                    }
+                },
+                series: [
+                    {
+                        name: 'Reputación Nutresa',
+                        type: 'gauge',
+                        startAngle: 90,
+                        endAngle: -90,
+                        detail: {formatter:'{value}%'},
+                        data: [{value: data}]
+                    }
+                ]
+
+            };
+
+            myChart.setOption(option);
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html ng-app="myModule">
+<head>
+    <meta charset="utf-8" />
+    <title> Highcharts directive demo </title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+    <script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body ng-controller="myController">
+
+<hc-chart-line title="Demografía de los usuarios en la Red" data="age_gender_data" categories="age_gender_categories">age_gender</hc-chart-line>
+<hc-chart-antiquity title="Antigüedad de los usuarios de twitter según años." data="antiquity_data" >antiquity</hc-chart-antiquity>
+<hc-chart-preference-tweet title="Preferecia de tuitero" data="preference_tweet_data" categories="preference_tweet_categories">preference_tweet</hc-chart-preference-tweet>
+<hc-chart-day-tweet title="Procentaje y promedio de tweets según día de la semana" data="day_tweet_data">day_tweet</hc-chart-day-tweet>
+
+
+<hc-chart-user-followers title="Número de seguidores por usuario." data="user_followers_data">user_followers</hc-chart-user-followers>
+
+<script>
+
+
+    angular.module('myModule', [])
+        .controller('myController', function ($scope, $location, $window, $http) {
+            $scope.error = [];
+            $scope.day_tweets = [];
+            $scope.age_gender = [];
+            $scope.age_gender_url = [];
+            $scope.antiquity_data = [];
+            $scope.preference_tweet_data = [];
+            //preference_tweet_categories = [];
+            $scope.age_gender_data = [];
+            $scope.activity_data = [];
+            $scope.day_tweet_data = [];
+            $scope.interest_polarity_data = [];
+
+            ////////nuevos
+            $scope.user_followers_data = []
+
+           // $scope.age_gender_categories = ['18 a 24', '25 a 34', '35 a 39', '50 a 64', '65 y más'];
+
+            /*$http.get('http://alianzacaoba.mockable.io/ssd/social_media/day_tweets')
+             .success(function(data) {
+             if(data != "")
+             {
+             // Borramos los datos del formulario
+             console.log(" Info day_tweets --- " + data);
+             $scope.day_tweets = data;
+             }
+             else{
+
+             $scope.error.push({"Service ": "social_media/day_tweets", "Error": "No hay datos."});
+             }
+             })
+             .error(function(data) {
+             $scope.error.push({"Service ": "social_media/day_tweets", "Error": data});
+             console.log('Error: ' + data);
+             });
+
+             $http.get('http://alianzacaoba.mockable.io/ssd/social_media/age_gender')
+             .success(function(data) {
+             if(data != "")
+             {
+             // Borramos los datos del formulario
+             console.log(" Info age_gender --- " + data);
+             $scope.age_gender_url = data;
+             $scope.age_gender_categories = data[0].value;
+             console.log(" Info age_gender --- " + data[0].value);
+             }
+             else{
+
+             $scope.error.push({"Service ": "social_media/age_gender", "Error": "No hay datos."});
+             }
+             })
+             .error(function(data) {
+             $scope.error.push({"Service ": "social_media/age_gender", "Error": data});
+             console.log('Error: ' + data);
+             });
+             */
+
+            // Sample options for first chart
+            $scope.chartOptions = {
+                title: {
+                    text: 'Temperature data'
+                },
+                xAxis: {
+                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                },
+
+                series: [{
+                    data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
+                }]
+            };
+
+
+            $scope.pieData =[
+
+                {name: 'Noticias',data: [29.41, 55.88, 14.71],
+                    sliced: true,
+                    selected: true},
+                {name: 'Televisión',data: [29.41, 55.88, 14.71]},
+                {name: 'Entretenimiento',data: [29.41, 55.88, 14.71]},
+                {name: 'Religión',data: [29.41, 55.88, 14.71]}
+            ]
+
+
+              var chart = angular.element(document.getElementById('theChartElement')).highcharts();
+        })
+
+        // Directive for pie charts, pass in title and data only
+        .directive('hcChartDayTweet', function ($http) {
+            return {
+                restrict: 'E',
+                template: '<div></div>',
+                scope: {
+                    title: '@',
+                    data: '='
+                },
+                link: function (scope, element) {
+                    scope.chartConfig={
+                        chart: {
+                            zoomType: 'xy'
+                        },
+                        title: {
+                            text: scope.title
+                        },
+                        subtitle: {
+                            text: 'Source: Twitter'
+                        },
+                        xAxis: [{
+                            categories: scope.categories,
+                            crosshair: true
+                        }],
+                        yAxis: [{ // Primary yAxis
+                            labels: {
+                                format: '{value}',
+                                style: {
+                                    color: Highcharts.getOptions().colors[1]
+                                }
+                            },
+                            title: {
+                                text: 'Promedio',
+                                style: {
+                                    color: Highcharts.getOptions().colors[1]
+                                }
+                            }
+                        }, { // Secondary yAxis
+                            title: {
+                                text: 'Porcentaje',
+                                style: {
+                                    color: Highcharts.getOptions().colors[0]
+                                }
+                            },
+                            labels: {
+                                format: '{value}%',
+                                style: {
+                                    color: Highcharts.getOptions().colors[0]
+                                }
+                            },
+                            opposite: true
+                        }],
+                        tooltip: {
+                            shared: true
+                        },
+                        legend: {
+                            reversed: true
+                        },
+
+                    };
+
+                    if (scope.data != undefined) {
+                        $http.get('http://alianzacaoba.mockable.io/ssd/social_media/day_tweets')
+                            .success(function(data) {
+                                if(data != "")
+                                {
+                                    console.log(" Info day of tweets --- " + data);
+                                    scope.categories = data[0].value;
+                                    scope.day_tweet_data = [{
+                                        name: 'Porcentaje',
+                                        type: 'column',
+                                        yAxis: 1,
+                                        data: data[1].value,
+                                        tooltip: {
+                                            valueSuffix: ' %'
+                                        }
+
+                                    }, {
+                                        name: 'Promedio',
+                                        type: 'spline',
+                                        data: data[2].value
+
+                                    }];
+
+                                    scope.chartConfig.xAxis= {
+                                        categories: scope.categories
+                                    };
+                                    scope.chartConfig.series = scope.day_tweet_data;
+                                    $(element).highcharts(scope.chartConfig);
+                                }
+                                else{
+
+                                    $scope.error.push({"Service ": "social_media/day_tweets", "Error": "No hay datos."});
+                                }
+                            })
+                            .error(function(data) {
+                                scope.error.push({"Service ": "social_media/day_tweets", "Error": data});
+                                console.log('Error: ' + data);
+                            });
+
+                    }
+                }
+            };
+        })
+        // Directive gabriel BarGender for pie charts, pass in title and data only
+        .directive('hcChartLine', function ($http) {
+            return {
+                restrict: 'E',
+                template: '<div></div>',
+                scope: {
+                    title: '@',
+                    data: '=',
+                    categories: '='
+                },
+                link: function (scope, element, http) {
+                    scope.chartConfig = {
+                        chart: {
+                            type: 'bar'
+                        },
+                        title: {
+                            text: scope.title
+                        },
+                        subtitle: {
+                            text: 'Source: Twitter'
+                        },
+                        xAxis: [{
+                            categories: scope.categories,
+                            reversed: false,
+                            labels: {
+                                step: 1
+                            }
+                        }, { // mirror axis on right side
+                            opposite: true,
+                            reversed: false,
+                            categories: scope.categories,
+                            linkedTo: 0,
+                            labels: {
+                                step: 1
+                            }
+                        }],
+                        yAxis: {
+                            title: {
+                                text: null
+                            },
+                            labels: {
+                                formatter: function () {
+                                    return Math.abs(this.value) + '%';
+                                }
+                            }
+                        },
+
+                        plotOptions: {
+                            series: {
+                                stacking: 'normal'
+                            }
+                        },
+
+                        tooltip: {
+                            formatter: function () {
+                                return '<b>' + this.series.name + ', age ' + this.point.category + '</b><br/>' +
+                                    'Population: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0);
+                            }
+                        },
+
+                        series: scope.data
+                    };
+
+                    if (scope.data != undefined) {
+                        $http.get('http://alianzacaoba.mockable.io/ssd/social_media/age_gender')
+                            .success(function(data) {
+                                if(data != "")
+                                {
+                                    // Borramos los datos del formulario
+                                    console.log(" Info age_gender --- " + data);
+                                    scope.categories = data[0].value;
+                                    //$scope.age_gender_url = data;
+                                    //$scope.age_gender_categories = data[0].value;
+                                    console.log(" Info age_gender_categories --- " + data[0].value);
+                                    console.log(" Info age_gender_Femenino --- " + data[1].value);
+                                    console.log(" Info age_gender_Masculino --- " + data[2].value);
+                                    //scope.chartConfig.series = data;
+                                    //$(element).highcharts(scope.chartConfig);
+                                    scope.chartConfig.xAxis = [{
+                                        categories: scope.categories,
+                                        reversed: false,
+                                        labels: {
+                                            step: 1
+                                        }
+                                    }, { // mirror axis on right side
+                                        opposite: true,
+                                        reversed: false,
+                                        categories: scope.categories,
+                                        linkedTo: 0,
+                                        labels: {
+                                            step: 1
+                                        }
+                                    }];
+
+
+                                    scope.age_gender_data = [{
+                                        name: 'Masculino',
+                                        data: data[2].data
+                                    }, {
+                                        name: 'Femenino',
+                                        data: data[1].data
+                                    }];
+                                    scope.chartConfig.series = scope.age_gender_data;
+                                    $(element).highcharts(scope.chartConfig);
+                                }
+                                else{
+
+                                    $scope.error.push({"Service ": "social_media/age_gender", "Error": "No hay datos."});
+                                }
+                            })
+                            .error(function(data) {
+                                $scope.error.push({"Service ": "social_media/age_gender", "Error": data});
+                                console.log('Error: ' + data);
+                            });
+
+                    }
+
+                }
+            };
+        })
+        // Directive gabriel BarGender for pie charts, pass in title and data only
+        .directive('hcChartAntiquity', function ($http) {
+            return {
+                restrict: 'EA',
+                template: "<div></div>",
+                scope: {
+                    title: '@',
+                    data: '='
+                },
+                link: function (scope, element, http) {
+                    scope.chartConfig = {
+                        chart: {
+                            plotBackgroundColor: null,
+                            plotBorderWidth: null,
+                            plotShadow: false,
+
+                            width: scope.width,
+                            height: scope.height
+                        },
+                        title: {
+                            text: scope.title
+                        },
+                        tooltip: {
+                            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                        },
+                        plotOptions: {
+                            pie: {
+                                dataLabels: {
+                                    enabled: true,
+                                    distance: 25,
+                                    style: {
+                                        fontWeight: 'bold',
+                                        color: 'white',
+                                        textShadow: '0px 1px 2px black'
+                                    }
+                                },
+                                startAngle: -90,
+                                endAngle: 90,
+                                center: ['50%', '75%']
+                            }
+                        }
+                    };
+
+                    if (scope.data != undefined) {
+                        $http.get('http://alianzacaoba.mockable.io/ssd/social_media/antiquity')
+                            .success(function(data) {
+                                if(data != "")
+                                {
+
+                                    console.log(" Info age_gender --- " + data);
+
+                                    scope.antiquity_data = [{
+                                        type: 'pie',
+                                        name: 'Tipo',
+                                        innerSize: '50%',
+                                        data: data[0].value
+                                    }];
+
+                                    scope.chartConfig.series = scope.antiquity_data;
+                                    $(element).highcharts(scope.chartConfig);
+                                }
+                                else{
+
+                                    $scope.error.push({"Service ": "social_media/age_gender", "Error": "No hay datos."});
+                                }
+                            })
+                            .error(function(data) {
+                                scope.error.push({"Service ": "social_media/age_gender", "Error": data});
+                                console.log('Error: ' + data);
+                            });
+
+                    }
+
+                }
+            };
+        })
+        // Directive gabriel BarGender for pie charts, pass in title and data only
+        .directive('hcChartPreferenceTweet', function ($http) {
+            return {
+                restrict: 'EA',
+                template: "<div></div>",
+                scope: {
+                    title: '@',
+                    data: '=',
+                    categories: '='
+                },
+                link: function (scope, element, attrs) {
+                    scope.chartConfig = {
+                        chart: {
+                            type: 'bar'
+                        },
+                        title: {
+                            text: scope.title
+                        },
+                        xAxis: {
+                            categories: scope.categories
+                        },
+                        yAxis: {
+                            min: 0,
+                            title: {
+                                text: 'Source: Twitter'
+                            }
+                        },
+                        legend: {
+                            reversed: true
+                        },
+                        plotOptions: {
+                            series: {
+                                stacking: 'normal'
+                            }
+                        }
+                    };
+                    if (scope.data != undefined) {
+                        $http.get('http://alianzacaoba.mockable.io/ssd/social_media/preference_tweet')
+                            .success(function(data) {
+                                if(data != "")
+                                {
+                                    console.log(" Info age_gender --- " + data);
+                                    scope.categories = data[0].value;
+                                    scope.preference_tweet_data =  [data[1], data[2], data[3], data[4]];
+                                    scope.chartConfig.xAxis= {
+                                        categories: scope.categories
+                                    };
+                                    scope.chartConfig.series = scope.preference_tweet_data;
+                                    $(element).highcharts(scope.chartConfig);
+                                }
+                                else{
+
+                                    $scope.error.push({"Service ": "social_media/age_gender", "Error": "No hay datos."});
+                                }
+                            })
+                            .error(function(data) {
+                                scope.error.push({"Service ": "social_media/age_gender", "Error": data});
+                                console.log('Error: ' + data);
+                            });
+
+                    }
+
+                }
+            };
+        })
+
+
+        // Nuevos Graficos
+        .directive('hcChartUserFollowers', function ($http) {
+            return {
+                restrict: 'EA',
+                template: "<div></div>",
+                scope: {
+                    title: '@',
+                    data: '='
+                },
+                link: function (scope, element, http) {
+                    scope.chartConfig = {
+                        chart: {
+                            plotBackgroundColor: null,
+                            plotBorderWidth: null,
+                            plotShadow: false,
+
+                            width: scope.width,
+                            height: scope.height
+                        },
+                        title: {
+                            text: scope.title
+                        },
+                        tooltip: {
+                            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                        },
+                        plotOptions: {
+                            pie: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                dataLabels: {
+                                    enabled: true,
+                                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                                    style: {
+                                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                    }
+                                }
+                            }
+                        }
+                    };
+
+                    if (scope.data != undefined) {
+                        $http.get('http://alianzacaoba.mockable.io/ssd/social_media/user_followers')
+                            .success(function(data) {
+                                if(data != "")
+                                {
+
+                                    console.log(" Info age_gender --- " + data);
+
+                                    scope.user_followers_data = [{
+                                        type: 'pie',
+                                        name: 'Tipo',
+                                        innerSize: '50%',
+                                        data: data[0].value
+                                    }];
+
+                                    scope.chartConfig.series = scope.user_followers_data;
+                                    $(element).highcharts(scope.chartConfig);
+                                }
+                                else{
+
+                                    $scope.error.push({"Service ": "social_media/user_followers", "Error": "No hay datos."});
+                                }
+                            })
+                            .error(function(data) {
+                                scope.error.push({"Service ": "social_media/user_followers", "Error": data});
+                                console.log('Error: ' + data);
+                            });
+
+                    }
+
+                }
+            };
+        })
+    /*
+     .controller('myController', function ($scope, $location, $window, $http) {
+
+     $scope.day_tweets = [];
+     $scope.age_gender = [];
+     $scope.age_gender_url = [];
+     $scope.age_gender_categories = ['18 a 24', '25 a 34', '35 a 39', '50 a 64', '65 y más'];
+
+     $http.get('http://alianzacaoba.mockable.io/ssd/social_media/day_tweets')
+     .success(function(data) {
+     if(data != "")
+     {
+     // Borramos los datos del formulario
+     console.log(" Info day_tweets --- " + data);
+     $scope.day_tweets = data;
+     }
+     else{
+
+     $scope.error.push({"Service ": "social_media/day_tweets", "Error": "No hay datos."});
+     }
+     })
+     .error(function(data) {
+     $scope.error.push({"Service ": "social_media/day_tweets", "Error": data});
+     console.log('Error: ' + data);
+     });
+
+     $http.get('http://alianzacaoba.mockable.io/ssd/social_media/age_gender')
+     .success(function(data) {
+     if(data != "")
+     {
+     // Borramos los datos del formulario
+     console.log(" Info age_gender --- " + data);
+     $scope.age_gender_url = data;
+     $scope.age_gender_categories = data[0].value;
+     console.log(" Info age_gender --- " + data[0].value);
+     }
+     else{
+
+     $scope.error.push({"Service ": "social_media/age_gender", "Error": "No hay datos."});
+     }
+     })
+     .error(function(data) {
+     $scope.error.push({"Service ": "social_media/age_gender", "Error": data});
+     console.log('Error: ' + data);
+     });
+
+
+
+     // Sample options for first chart
+     $scope.chartOptions = {
+     title: {
+     text: 'Temperature data'
+     },
+     xAxis: {
+     categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+     },
+
+     series: [{
+     data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
+     }]
+     };
+
+     // Sample data for pie chart
+     $scope.age_gender_data = [{
+     name: 'Masculino',
+     data: [-2.4,
+     -2.5, -2.3, -1.2, -0.6]
+     }, {
+     name: 'Femenino',
+     data: [2.9, 2.9,
+     1.8, 1.2, 0.6]
+     }]
+
+
+     // Sample data for pie chart
+     $scope.pieData = [{
+     name: "Microsoft Internet Explorer",
+     y: 56.33
+     }, {
+     name: "Chrome",
+     y: 24.03,
+     sliced: true,
+     selected: true
+     }, {
+     name: "Firefox",
+     y: 10.38
+     }, {
+     name: "Safari",
+     y: 4.77
+     }, {
+     name: "Opera",
+     y: 0.91
+     }, {
+     name: "Proprietary or Undetectable",
+     y: 0.2
+     }]
+
+     var chart = angular.element(document.getElementById('theChartElement')).highcharts();
+     });*/
+</script>
+</body>
+</html>

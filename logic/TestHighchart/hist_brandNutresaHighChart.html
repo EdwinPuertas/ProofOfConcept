@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html ng-app="myModule">
+<head>
+    <meta charset="utf-8" />
+    <title> Highcharts directive demo </title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body>
+
+
+<div id="hist_brand" ></div>
+
+<script>
+    URL_MAP = "http://alianzacaoba.mockable.io/ssd/nutresa/hist_brand";
+    $.getJSON(URL_MAP,function(data,status) {
+        console.log(data);
+        var series_data = [];
+        for (var key in data) {
+            series_data.push({name: data[key].name, data: data[key].data});
+        }
+        var dataLegend = data[0].value;
+
+        series_data.shift();
+
+        Highcharts.chart('hist_brand', {
+
+            title: {
+                text: 'Comportamiento Histórico de Marcas '
+            },
+
+            subtitle: {
+                text: 'Source: thesolarfoundation.com'
+            },
+
+            yAxis: {
+                title: {
+                    text: 'Numero de Tuits'
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle'
+            },
+
+            plotOptions: [6,5,5,3,2,1,0],
+
+            series: series_data
+
+        });
+    })
+</script>
+</body>
+</html>

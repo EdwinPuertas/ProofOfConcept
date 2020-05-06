@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html ng-app="myModule">
+<head>
+    <meta charset="utf-8" />
+    <title> Highcharts directive demo </title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/treemap.js"></script>
+</head>
+<body>
+
+
+<div id="container" ></div>
+
+<script>
+    URL = "http://alianzacaoba.mockable.io/ssd/user_food_words&year=2016&month=8";
+    $.getJSON(URL,function(mydata,status) {
+        console.log(mydata);
+        var series_data = [];
+        for (var key in mydata){
+            series_data.push([ mydata[key].name, mydata[key].value ]);
+        }
+        var dataLegend = mydata[0].data;
+        series_data.shift();
+
+        Highcharts.chart('container', {
+            chart: {
+                "type": "line"
+            },
+            plotOptions: {
+                series: {
+                    dataLabels: {
+                        enabled: true
+                    }
+                },
+                line: {
+                    step: "left"
+                }
+            },
+            tooltip: {
+                pointFormat: '{point.y}%'
+            },
+
+            title: {
+                text: "Porcentaje de usuarios que publican sobre comida según momento del día de la publicación"
+            },
+            xAxis: {
+                type: "category"
+            },
+            yAxis: {
+                title: {
+                    text: 'Porcentaje'
+                }
+
+            },
+            series: [
+                {
+                    "index": 0,
+                    "name": "Porcentaje",
+                    "data": series_data
+                }]
+        });
+    })
+</script>
+</body>
+</html>

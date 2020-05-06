@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html ng-app="myModule">
+<head>
+    <meta charset="utf-8" />
+    <title> Highcharts directive demo </title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/treemap.js"></script>
+</head>
+<body>
+
+
+<div id="container" ></div>
+
+<script>
+    URL = "http://alianzacaoba.mockable.io/ssd/words_frecuency&year=2016&month=8";
+    $.getJSON(URL,function(data,status) {
+        console.log(data);
+        var series_data = [];
+        for (var key in data){
+            series_data.push({ name : data[key].name, y : data[key].value });
+        }
+
+
+        Highcharts.chart('container', {
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: ''
+            },
+            subtitle: {
+                text: ''
+            },
+            xAxis: {
+                type: 'category'
+            },
+            yAxis: {
+                title: {
+                    text: 'Frequencía de Uso'
+                }
+
+            },
+            legend: {
+                enabled: false
+            },
+            plotOptions: {
+                series: {
+                    borderWidth: 0,
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.y}'
+                    }
+                }
+            },
+
+            tooltip: {
+                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}<br/>'
+            },
+
+            series: [{
+                name: 'Frecuencia',
+                colorByPoint: true,
+                data: series_data
+            }],
+
+        });
+    })
+</script>
+</body>
+</html>

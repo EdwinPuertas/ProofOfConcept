@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html ng-app="myModule">
+<head>
+    <meta charset="utf-8" />
+    <title> Highcharts directive demo </title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body>
+
+
+<div id="city_emotion" ></div>
+
+<script>
+    URL_MAP = "http://alianzacaoba.mockable.io/ssd/nutresa/city_emotion";
+    $.getJSON(URL_MAP,function(data,status) {
+        console.log(data);
+        var series_data = [];
+        for (var key in data){
+            series_data.push({ name : data[key].name, data : data[key].value });
+        }
+        var dataLegend = data[0].value;
+        series_data.shift();
+
+        Highcharts.chart('city_emotion', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Emoción del TOP 10 de ciudades'
+            },
+            xAxis: {
+                categories: dataLegend,
+                crosshair: true
+
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Source: Tweeter'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: series_data
+        });
+    });
+
+</script>
+</body>
+</html>

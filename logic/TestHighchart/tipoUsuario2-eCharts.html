@@ -1,0 +1,126 @@
+<html>
+<head>
+    <title>ECharts Sample</title>
+    <script src="http://echarts.baidu.com/dist/echarts.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+</head>
+<body>
+<div id="chart" style="width: 500px; height: 350px;"></div>
+<script type="text/javascript">
+
+    var chart = document.getElementById('chart');
+    var myChart = echarts.init(chart);
+
+    var dataStyle = {
+        normal: {
+            label: {show:false},
+            labelLine: {show:false},
+            shadowBlur: 40,
+            shadowColor: 'rgba(40, 40, 40, 0.5)',
+        }
+    };
+
+    var placeHolderStyle = {
+        normal : {
+            color: 'rgba(0,0,0,0)',
+            label: {show:false},
+            labelLine: {show:false}
+        },
+        emphasis : {
+            color: 'rgba(0,0,0,0)'
+        }
+    };
+
+    var option = {
+
+        backgroundColor: '#fffff',
+        color: ['#85b6b2', '#6d4f8d','#cd5e7e'],
+        tooltip : {
+            show: true,
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        legend: {
+            itemGap:8,
+            data:["Común","Influyente","Famoso"]
+        },
+        toolbox: {
+            show : true,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
+        series : [
+            {
+                name:'Común',
+                type:'pie',
+                clockWise:false,
+                radius : [130,150],
+                itemStyle : dataStyle,
+                hoverAnimation: false,
+
+                data:[
+                    {
+                        value:86.96,
+                        name:'Común'
+                    },
+                    {
+                        value:24,
+                        name:'invisible',
+                        itemStyle : placeHolderStyle
+                    }
+
+                ]
+            },
+            {
+                name:'Influyente',
+                type:'pie',
+                clockWise:false,
+                radius : [110, 130],
+                itemStyle : dataStyle,
+                hoverAnimation: false,
+
+                data:[
+                    {
+                        value:10.43,
+                        name:'Influyente'
+                    },
+                    {
+                        value:89,
+                        name:'invisible',
+                        itemStyle : placeHolderStyle
+                    }
+                ]
+            },
+            {
+                name:'Famoso',
+                type:'pie',
+                clockWise:false,
+                hoverAnimation: false,
+                radius : [90, 110],
+                itemStyle : dataStyle,
+
+                data:[
+                    {
+                        value:2.61,
+                        name:'Famoso'
+                    },
+                    {
+                        value:20,
+                        name:'invisible',
+                        itemStyle : placeHolderStyle
+                    }
+                ]
+            }
+        ]
+    };
+
+    myChart.setOption(option);
+
+</script>
+
+</body>
+</html>
